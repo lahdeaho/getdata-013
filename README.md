@@ -1,27 +1,106 @@
 # getdata-013
-Getting and Cleaning Data
-
-## Course Project
-
-The purpose of this project is to demonstrate your ability to collect, work with, and clean a data set. The goal is to prepare tidy data that can be used for later analysis. You will be graded by your peers on a series of yes/no questions related to the project. You will be required to submit: 
-* 1) a tidy data set as described below, 
-* 2) a link to a Github repository with your script for performing the analysis, and 
-* 3) a code book that describes the variables, the data, and any transformations or work that you performed to clean up the data called CodeBook.md. 
-You should also include a README.md in the repo with your scripts. This repo explains how all of the scripts work and how they are connected.  
-
-One of the most exciting areas in all of data science right now is wearable computing - see for example  this article . Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone. A full description is available at the site where the data was obtained: 
-
-http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones 
-
-Here are the data for the project: 
-
-https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip 
-
- You should create one R script called run_analysis.R that does the following. 
-* 1.Merges the training and the test sets to create one data set.
-* 2.Extracts only the measurements on the mean and standard deviation for each measurement. 
-* 3.Uses descriptive activity names to name the activities in the data set
-* 4.Appropriately labels the data set with descriptive variable names. 
-* 5.From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
-
-Good luck!
+## Getting and Cleaning Data -course
+## Purpose
+* This project is one of the course assignments.
+* The analysis script will merge the datasets and aggregate mean from every calculated Standard Deviation and Mean variables.
+* The result will be saved to file
+* More information about the data: http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+## Usage
+1. Get the file from https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+2. Unzip it to R working directory
+3. Download the script `run_analysis.R` from this repository
+4. Run the script 
+5. The script will write output file named `aggrageted_data.txt`
+## Workflow of script
+### Set constant variables
+Every variable in the script is defined at the beginning to help adjust file location etc.
+```
+directory <- "UCI HAR Dataset"
+featFile <- "features.txt"
+actFile <- "activity_labels.txt"
+testFile <- "test/x_test.txt"
+testLblFile <- "test/y_test.txt"
+testSubjFile <- "test/subject_test.txt"
+trainFile <- "train/x_train.txt"
+trainLblFile <- "train/y_train.txt"
+trainSubjFile <- "train/subject_train.txt"
+stdPart <- "std()"
+meanPart <- "mean()"
+lbl1 <- "ActivityId"
+lbl2 <- "Activity"
+lbl3 <- "SubjectId"
+```
+## Filter labels for columns which will be loaded
+### Read feature file and get column labels
+```
+lbls <- read.table(paste(directory, featFile, sep="/"))
+names <- as.vector(t(lbls[2]))
+```
+### Read activity labels
+```
+act_lbls <- read.table(paste(directory, actFile, sep="/"), col.names=c(lbl1, lbl2))
+```
+### Find columns that has std() or mean() function variables
+```
+std_mean <- grepl(stdPart, names, fixed = TRUE) | grepl(meanPart, names, fixed = TRUE)
+```
+### Set class only for columns to be requested
+```
+names <- names[std_mean]
+std_mean[std_mean] <- "numeric"
+```
+### Set other columns to NULL (those will be ignored)
+```
+std_mean[std_mean == "FALSE"] <- "NULL"
+```
+## Read data
+### Read Test data and labels
+```
+data1 <- read.table(paste(directory, testFile, sep="/"), colClasses=std_mean)
+data1_lbls <- read.table(paste(directory, testLblFile, sep="/"), col.names=c(lbl1)) 
+data1_subj <- read.table(paste(directory, testSubjFile, sep="/"), col.names=c(lbl3)) 
+```
+### Read Train data and labels
+```
+data2 <- read.table(paste(directory, trainFile, sep="/"), colClasses=std_mean)
+data2_lbls <- read.table(paste(directory, trainLblFile, sep="/"), col.names=c(lbl1)) 
+data2_subj <- read.table(paste(directory, trainSubjFile, sep="/"), col.names=c(lbl3))
+```
+## Combine datasets
+### Join activity label names to data labels
+```
+data1_lbls <- merge(data1_lbls, act_lbls)
+data2_lbls <- merge(data2_lbls, act_lbls)
+```
+### Join subject labels to data
+```
+data1 <- cbind(data1, data1_subj)
+data2 <- cbind(data2, data2_subj)
+```
+### Join activity labels to data
+```
+data1 <- cbind(data1, data1_lbls)
+data2 <- cbind(data2, data2_lbls)
+```
+### Combine datasets to one set
+```
+data1 <- rbind(data1, data2)
+```
+### Set column names
+```
+names(data1) <- c(names, lbl3, lbl1, lbl2)
+```
+## Analysis
+### Aggregate data
+```
+data_mean <- aggregate(data1[, 1:66], list(data1$SubjectId, data1$Activity), mean)
+```
+### Rename two first columns
+```
+names(data_mean)[1] <- "Subject"
+names(data_mean)[2] <- "Activity"
+```
+### Write output
+```
+write.table(data_mean, file="aggregated_data.txt", row.name=FALSE)
+```
