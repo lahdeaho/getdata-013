@@ -33,6 +33,7 @@ getData <- function(directory = "UCI HAR Dataset") {
   std_mean <- grepl(stdPart, names, fixed = TRUE) | grepl(meanPart, names, fixed = TRUE)
   
   ## Set class only for columns to be requested
+  names <- names[std_mean]
   std_mean[std_mean] <- "numeric"
   
   ## Set other columns to NULL (those will be ignored)
@@ -43,13 +44,13 @@ getData <- function(directory = "UCI HAR Dataset") {
   # Read data
   
   ## Read Test data and labels
-  data1 <- read.table(paste(directory, testFile, sep="/"), colClasses=std_mean, col.names=names)
-  data1_lbls <- read.table(paste(directory, testLblFile, sep="/"), col.names=c(lbl1))
-  data1_subj <- read.table(paste(directory, testSubjFile, sep="/"), col.names=c(lbl3))
+  data1 <- read.table(paste(directory, testFile, sep="/"), colClasses=std_mean)
+  data1_lbls <- read.table(paste(directory, testLblFile, sep="/"), col.names=c(lbl1)) 
+  data1_subj <- read.table(paste(directory, testSubjFile, sep="/"), col.names=c(lbl3)) 
   
   ## Read Train data and labels
-  data2 <- read.table(paste(directory, trainFile, sep="/"), colClasses=std_mean, col.names=names)
-  data2_lbls <- read.table(paste(directory, trainLblFile, sep="/"), col.names=c(lbl1))
+  data2 <- read.table(paste(directory, trainFile, sep="/"), colClasses=std_mean)
+  data2_lbls <- read.table(paste(directory, trainLblFile, sep="/"), col.names=c(lbl1)) 
   data2_subj <- read.table(paste(directory, trainSubjFile, sep="/"), col.names=c(lbl3))
   
   
@@ -74,5 +75,9 @@ getData <- function(directory = "UCI HAR Dataset") {
   
   
   # Return combined dataset
+  ## Set column names
+  names(data1) <- c(names, lbl1, lbl2, lbl3)
+  
+  ## Return
   data1 
 }
