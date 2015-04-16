@@ -76,7 +76,7 @@ getData <- function(directory = "UCI HAR Dataset") {
   
   # Return combined dataset
   ## Set column names
-  names(data1) <- c(names, lbl1, lbl2, lbl3)
+  names(data1) <- c(names, lbl3, lbl1, lbl2)
   
   ## Return
   data1 
