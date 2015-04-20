@@ -1,6 +1,8 @@
 ## The CodeBook
 
 ### Variables in the output dataset
+run_analysis.R script output file which contains averages of different variables.
+The variables are described in the following list:
 
 1.  Subject = Subject identifier
 2.  Activity = Activity label
