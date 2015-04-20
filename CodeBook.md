@@ -72,3 +72,5 @@ The variables are described in the following list:
 66.  fBodyBodyGyroMag-std()  = Average standard deviation of body angular velocity Jerk signal in Fast Fourier Transform (FFT)
 67.  fBodyBodyGyroJerkMag-mean()  = Average standard deviation of body angular velocity Jerk signal in Fast Fourier Transform (FFT)
 68.  fBodyBodyGyroJerkMag-std() = Average standard deviation of body angular velocity Jerk signal in Fast Fourier Transform (FFT)
+
+Please read the README.MD to find more information about the source variables.
